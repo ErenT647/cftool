@@ -99,4 +99,10 @@ def get_user_subs(user):
         curr_streak += 1
         
         max_streak = max(max_streak, curr_streak)
-        
+    return {
+        "maxStreak": max_streak,
+        "streak": streak,
+        "problemsSolved": total_solved,
+        "problemsSolvedInLastMonth": month_solved
+    }
+

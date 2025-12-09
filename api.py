@@ -59,3 +59,44 @@ def get_user_info(user):
         "maxRank": info["maxRank"],
         "organization": info["organization"]
     }
+
+def get_user_subs(user):
+    req = requests.get(f"https://codeforces.com/api/user.status?handle={user}")
+    info = req.json()["result"]
+    total_solved = 0
+    month_solved = 0
+    streak = 0
+    max_streak = 0
+
+    curr_time = datetime.now()
+    last = curr_time
+    curr_streak = 1
+    for s in info:
+        sub_time = datetime.fromtimestamp(int(s["creationTimeSeconds"]), tz=datetime.timezone(timedelta(hours=-6)))
+        if s["verdict"] != "OK":
+            continue
+                
+        total_solved += 1
+        if sub_time.month == curr_time.month:
+            month_solved += 1
+
+        max_streak = max(max_streak, curr_streak)
+
+        if timedelta(sub_time, curr_time).days < 1:
+            streak = 1
+            continue
+        
+        if timedelta(sub_time, curr_time) < 1:
+            streak += 1
+            curr_time = sub_time
+
+        if timedelta(sub_time, last).days < 1:
+            continue
+
+        if timedelta(sub_time, last).days > 1:
+            last = sub_time
+
+        curr_streak += 1
+        
+        max_streak = max(max_streak, curr_streak)
+        
